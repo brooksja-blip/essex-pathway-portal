@@ -1,0 +1,85 @@
+/* ========================================================================
+   Pathway Portal - additions for profile editor rebuild (11 June 2026)
+   Append these styles to the bottom of styles.css
+   ======================================================================== */
+
+/* ---- Calculated annual cost panel (Costs section) ---- */
+.calculated-field {
+  background: var(--surface-2, #f5f7fa);
+  border: 1px solid var(--border, #e3e7ed);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin: 16px 0;
+  border-left: 4px solid var(--pw-teal, #16B8C7);
+}
+.calculated-field.pending {
+  border-left-color: var(--border-strong, #c3cad5);
+  opacity: 0.85;
+}
+.calculated-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary, #6b7280);
+  margin-bottom: 6px;
+}
+.calculated-field-value {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink, #1a202c);
+  margin-bottom: 8px;
+}
+.calculated-field.pending .calculated-field-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary, #6b7280);
+}
+.calculated-field-note {
+  font-size: 12px;
+  color: var(--text-secondary, #6b7280);
+  font-style: italic;
+}
+
+/* ---- Grouped multi-choice (Special interests) ---- */
+.multi-choice-grouped {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.multi-choice-group-header {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary, #6b7280);
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border, #e3e7ed);
+}
+
+/* ---- Muted prompts beneath narrative help text ---- */
+.field-help-muted {
+  font-size: 12px;
+  color: var(--text-tertiary, #9ca3af);
+  font-style: italic;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+/* ---- Royal Arch Chapters repeating list ---- */
+.ra-chapters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.ra-chapter-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.ra-chapter-row input[type="text"] {
+  flex: 1;
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pathway Portal &middot; Essex Province</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Leaflet (map library) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<!-- Portal styles -->
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="root"></div>
+
+<!-- 
+  Script load order matters - each script depends on the ones before it:
+  data.js    - lodge/centre/lineage data + logo reference
+  core.js    - State object, utilities (escapeHtml, on, etc), routing, render loop
+  views.js   - all render functions for dashboard, find, lodge detail, directory, etc
+  profile.js - the lodge profile editor (separate to keep it tidy)
+  handlers.js- event handlers and init (calls render() to start things up)
+-->
+<script src="data.js"></script>
+<script src="core.js"></script>
+<script src="views.js"></script>
+<script src="profile.js"></script>
+<script src="handlers.js"></script>
+</body>
+</html>
