@@ -22,15 +22,17 @@
 
 <!-- 
   Script load order matters - each script depends on the ones before it:
-  data.js    - lodge/centre/lineage data + logo reference
-  core.js    - State object, utilities (escapeHtml, on, etc), routing, render loop
-  views.js   - all render functions for dashboard, find, lodge detail, directory, etc
-  profile.js - the lodge profile editor (separate to keep it tidy)
-  handlers.js- event handlers and init (calls render() to start things up)
+  data.js             - lodge/centre/lineage data + logo reference
+  core.js             - State object, utilities (escapeHtml, on, etc), routing, render loop
+  views.js            - all render functions for dashboard, find, lodge detail, directory, etc
+  example_profiles.js - baked-in example profile data for selected lodges
+  profile.js          - the lodge profile editor (separate to keep it tidy)
+  handlers.js         - event handlers and init (calls render() to start things up)
 -->
 <script src="data.js"></script>
 <script src="core.js"></script>
 <script src="views.js"></script>
+<script src="example_profiles.js"></script>
 <script src="profile.js"></script>
 <script src="handlers.js"></script>
 </body>

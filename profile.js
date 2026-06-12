@@ -17,6 +17,14 @@ function loadProfile(lodgeId) {
     const stored = localStorage.getItem(profileKey(lodgeId));
     if (stored) loaded = JSON.parse(stored);
   } catch (e) {}
+  // Priority: localStorage override > baked-in example profile > old enriched
+  // demo data > empty defaults. localStorage always wins so the user's own
+  // edits never get clobbered by a baked-in example.
+  if (!loaded) {
+    if (typeof getExampleProfile === 'function') {
+      loaded = getExampleProfile(lodgeId);
+    }
+  }
   if (!loaded) {
     const en = PORTAL_DATA.enriched[lodgeId];
     loaded = en ? enrichedToProfile(en) : emptyProfile();
@@ -25,13 +33,16 @@ function loadProfile(lodgeId) {
   return Object.assign({}, emptyProfile(), loaded);
 }
 
-// Check whether the user has explicitly saved a profile (distinct from
-// having enriched/imported data). Used to tell "draft profile" apart from
-// "imported sample data" on the lodge detail view.
+// Check whether a profile exists for this lodge from any source: the user's
+// localStorage override OR a baked-in example. Used to tell "draft profile"
+// apart from "no profile at all" on the lodge detail view and in the admin
+// dashboard's Outstanding worklist.
 function hasStoredProfile(lodgeId) {
   try {
-    return !!localStorage.getItem(profileKey(lodgeId));
-  } catch (e) { return false; }
+    if (localStorage.getItem(profileKey(lodgeId))) return true;
+  } catch (e) {}
+  if (typeof hasExampleProfile === 'function' && hasExampleProfile(lodgeId)) return true;
+  return false;
 }
 
 function emptyMeetingRule() { return { ordinal: '', day: '', months: [] }; }
@@ -988,7 +999,7 @@ function renderProfilePreview(lodge, p) {
   }
   if (p.meetsAt) facts.push(['Meets at', p.meetsAt]);
   if (p.timeOfDay) facts.push(['Time of day', p.timeOfDay]);
-  if (p.typicalMeetingLength) facts.push(['Meeting length', p.typicalMeetingLength]);
+  if (p.meetingDuration) facts.push(['Meeting length', p.meetingDuration]);
   if (p.subscribingMembers !== '' && p.subscribingMembers !== null && p.subscribingMembers !== undefined) {
     facts.push(['Subscribing members', `Around ${p.subscribingMembers}`]);
   }
@@ -1054,7 +1065,7 @@ function renderProfilePreview(lodge, p) {
           <p><strong>Meeting schedule:</strong> ${escapeHtml(summarizeMeetingRules(p.meetingRules || []) || 'To be confirmed')}</p>
           ${p.meetsAt ? `<p><strong>Venue:</strong> ${escapeHtml(p.meetsAt)}</p>` : ''}
           ${p.timeOfDay ? `<p><strong>Time of day:</strong> ${escapeHtml(p.timeOfDay)}</p>` : ''}
-          ${p.typicalMeetingLength ? `<p><strong>How long a meeting takes:</strong> roughly ${escapeHtml(p.typicalMeetingLength)} from start to finish, including the Festive Board afterwards.</p>` : ''}
+          ${p.meetingDuration ? `<p><strong>How long a meeting takes:</strong> roughly ${escapeHtml(p.meetingDuration)} from start to finish.</p>` : ''}
         </section>
 
         <section>
@@ -1544,10 +1555,13 @@ function renderLodgeProfileSummary(lodge, p) {
 
   // About this lodge - narrative
   const aboutParts = [];
+  if (p.summary) aboutParts.push(`<p class="profile-summary-intro">${escapeHtml(p.summary)}</p>`);
   if (p.whyJoin) aboutParts.push(`<h4>Why join this lodge</h4><p>${escapeHtml(p.whyJoin)}</p>`);
   if (p.background) aboutParts.push(`<h4>Background and history</h4><p>${escapeHtml(p.background)}</p>`);
   if (p.traditionsNarrative) aboutParts.push(`<h4>Traditions and ritual style</h4><p>${escapeHtml(p.traditionsNarrative)}</p>`);
+  if (p.charityNarrative) aboutParts.push(`<h4>Charity work</h4><p>${escapeHtml(p.charityNarrative)}</p>`);
   if (p.memberExpectations) aboutParts.push(`<h4>What we ask of members</h4><p>${escapeHtml(p.memberExpectations)}</p>`);
+  if (p.costsNarrative) aboutParts.push(`<h4>Notes on costs</h4><p>${escapeHtml(p.costsNarrative)}</p>`);
   if (aboutParts.length) {
     sections.push(`<div class="section"><h3>About this lodge</h3>${aboutParts.join('')}</div>`);
   }
@@ -1557,12 +1571,12 @@ function renderLodgeProfileSummary(lodge, p) {
   const meetingsSummary = (typeof summarizeMeetingRules === 'function') ? summarizeMeetingRules(p.meetingRules || []) : '';
   if (meetingsSummary) meetingParts.push(_pair('Meets', meetingsSummary));
   if (p.meetsAt) meetingParts.push(_pair('Venue', p.meetsAt));
-  if (p.meetingTime) meetingParts.push(_pair('Start time', p.meetingTime));
   if (p.timeOfDay) meetingParts.push(_pair('Time of day', p.timeOfDay));
-  if (p.typicalMeetingLength) meetingParts.push(_pair('Typical meeting length', p.typicalMeetingLength));
+  if (p.meetingDuration) meetingParts.push(_pair('Typical meeting length', p.meetingDuration));
   if (p.loiLocation) meetingParts.push(_pair('Lodge of Instruction', p.loiLocation));
   if (p.loiFrequency) meetingParts.push(_pair('LoI frequency', p.loiFrequency));
   if (p.loiDay) meetingParts.push(_pair('LoI day', p.loiDay));
+  if (p.loiTime) meetingParts.push(_pair('LoI start time', p.loiTime));
   if (p.loiNotes) meetingParts.push(`<p>${escapeHtml(p.loiNotes)}</p>`);
   if (meetingParts.length) {
     sections.push(`<div class="section"><h3>Meeting pattern</h3>${meetingParts.join('')}</div>`);
@@ -1573,6 +1587,7 @@ function renderLodgeProfileSummary(lodge, p) {
   if (p.subscribingMembers !== '' && p.subscribingMembers !== null) membershipParts.push(_pair('Subscribing members', p.subscribingMembers));
   if (p.regularAttendance !== '' && p.regularAttendance !== null) membershipParts.push(_pair('Regular attendance', p.regularAttendance));
   if (p.ageProfile) membershipParts.push(_pair('Age profile', p.ageProfile));
+  if (p.ageNotes) membershipParts.push(`<p>${escapeHtml(p.ageNotes)}</p>`);
   if (p.health) membershipParts.push(_pair('Lodge health', p.health));
   if (p.lodgeCommunity) membershipParts.push(`<h4>Lodge community</h4><p>${escapeHtml(p.lodgeCommunity)}</p>`);
   if (p.lodgeOnHold) membershipParts.push(`<p class="profile-warning">This lodge is currently on hold.</p>`);
@@ -1612,13 +1627,16 @@ function renderLodgeProfileSummary(lodge, p) {
 
   // Ritual and education
   const ritualParts = [];
-  if (p.ritualStandard) ritualParts.push(_pair('Ritual standard', p.ritualStandard));
+  if (p.ritual) ritualParts.push(_pair('Ritual used', p.ritual));
+  if (p.ritualQuality) ritualParts.push(_pair('Ritual standard', p.ritualQuality));
   if (p.ritualNotes) ritualParts.push(`<p>${escapeHtml(p.ritualNotes)}</p>`);
   if (p.educationPractices && p.educationPractices.length) {
     ritualParts.push('<h4>Masonic education practices</h4>');
     ritualParts.push(_tags(p.educationPractices, 'practice'));
   }
   if (p.educationNotes) ritualParts.push(`<p>${escapeHtml(p.educationNotes)}</p>`);
+  if (p.consecratedYear) ritualParts.push(_pair('Year consecrated', p.consecratedYear));
+  if (p.sponsoringLodge) ritualParts.push(_pair('Sponsoring lodge', p.sponsoringLodge));
   if (ritualParts.length) {
     sections.push(`<div class="section"><h3>Ritual and education</h3>${ritualParts.join('')}</div>`);
   }
@@ -1695,16 +1713,16 @@ function renderLodgeProfileSummary(lodge, p) {
 
   // Royal Arch
   const raChapters = (p.raChapters || []).filter(c => c && c.trim());
-  if (raChapters.length) {
-    sections.push(`
-      <div class="section">
-        <h3>Royal Arch</h3>
-        <p>Lodge members are Companions of:</p>
-        <ul class="profile-list">
-          ${raChapters.map(c => `<li>${escapeHtml(c)}</li>`).join('')}
-        </ul>
-      </div>
-    `);
+  const hasRA = p.raRepresentative || (p.raCompanionsInLodge !== '' && p.raCompanionsInLodge !== null) || raChapters.length;
+  if (hasRA) {
+    const raParts = [];
+    if (p.raRepresentative) raParts.push(_pair('Lodge Royal Arch Representative', p.raRepresentative));
+    if (p.raCompanionsInLodge !== '' && p.raCompanionsInLodge !== null) raParts.push(_pair('Royal Arch Companions in the lodge', p.raCompanionsInLodge));
+    if (raChapters.length) {
+      raParts.push(`<h4>Chapters that Lodge members are Companions of</h4>`);
+      raParts.push(`<ul class="profile-list">${raChapters.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul>`);
+    }
+    sections.push(`<div class="section"><h3>Royal Arch</h3>${raParts.join('')}</div>`);
   }
 
   // Sign-off - only show if profile is approved/submitted
