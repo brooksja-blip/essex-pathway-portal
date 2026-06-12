@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quick start guide - Essex Pathway Portal</title>
+<style>
+  :root {
+    --pw-blue: #1E5BCC;
+    --pw-blue-deep: #1746A8;
+    --pw-teal: #16B8C7;
+    --pw-green: #2FA94D;
+    --pw-orange: #F37029;
+    --pw-magenta: #D946A8;
+    --ink: #1a202c;
+    --ink-2: #4A5567;
+    --ink-3: #6B7280;
+    --border: #E5E8EE;
+    --border-strong: #C3CAD5;
+    --surface: #FFFFFF;
+    --surface-2: #F5F7FA;
+    --bg: #F7F8FA;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+  body {
+    font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.005em;
+  }
+
+  /* ---- Top bar ---- */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .topbar-brand-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--pw-blue), var(--pw-teal));
+  }
+  .topbar-brand-sub {
+    font-size: 11px; font-weight: 500; color: var(--ink-3);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    display: block;
+  }
+  .topbar-actions {
+    display: flex; gap: 10px;
+  }
+  .btn {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.12s ease;
+  }
+  .btn:hover {
+    border-color: var(--ink-3);
+  }
+  .btn-primary {
+    background: var(--pw-blue);
+    border-color: var(--pw-blue);
+    color: #FFFFFF;
+  }
+  .btn-primary:hover {
+    background: var(--pw-blue-deep);
+    border-color: var(--pw-blue-deep);
+  }
+
+  /* ---- Page layout ---- */
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 32px 96px;
+  }
+  .page-eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--pw-blue);
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    margin-bottom: 14px;
+  }
+  .lead {
+    font-size: 17px;
+    color: var(--ink-2);
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+
+  /* ---- Table of contents ---- */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 48px;
+  }
+  .toc-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+    margin-bottom: 12px;
+  }
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+    margin: 0; padding: 0;
+  }
+  .toc li {
+    counter-increment: toc;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .toc li:last-child { border-bottom: none; }
+  .toc a {
+    text-decoration: none;
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .toc a::before {
+    content: counter(toc, decimal-leading-zero);
+    color: var(--pw-blue);
+    font-weight: 700;
+    font-size: 12px;
+    min-width: 24px;
+  }
+  .toc a:hover { color: var(--pw-blue); }
+
+  /* ---- Sections ---- */
+  section {
+    margin-bottom: 48px;
+    scroll-margin-top: 24px;
+  }
+  section h2 {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--pw-blue);
+    display: inline-block;
+  }
+  section p {
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  section strong {
+    font-weight: 700;
+    color: var(--ink);
+  }
+  section ul {
+    margin: 10px 0 14px 24px;
+    padding: 0;
+  }
+  section li {
+    margin-bottom: 6px;
+  }
+  section a {
+    color: var(--pw-blue);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  section a:hover { text-decoration: underline; }
+
+  /* ---- Tip / Note callouts ---- */
+  .callout {
+    background: var(--surface);
+    border-left: 4px solid var(--pw-teal);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .callout strong {
+    color: #0F94A1;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .callout.warning { border-left-color: var(--pw-orange); }
+  .callout.warning strong { color: #8B4A0F; }
+
+  /* ---- Footer ---- */
+  .page-footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--ink-3);
+    font-size: 13px;
+  }
+
+  /* ============================================================
+     PRINT STYLES
+     ============================================================ */
+  @media print {
+    body { background: #fff; }
+    .topbar, .topbar-actions { display: none; }
+    .page {
+      max-width: none;
+      padding: 0;
+      margin: 0;
+    }
+    .toc {
+      background: #fff;
+      border: 1px solid #ccc;
+    }
+    .toc a::before { color: #000; }
+    section h2 {
+      border-bottom-color: #000;
+      page-break-after: avoid;
+    }
+    section {
+      page-break-inside: avoid;
+    }
+    .callout {
+      background: #f5f5f5;
+      border-left-color: #666;
+    }
+    .callout strong { color: #000; }
+    .page-footer {
+      font-size: 10px;
+    }
+    /* Repeat URL on each printed page in the footer */
+    @page {
+      margin: 20mm 18mm;
+    }
+    h1 { font-size: 28px; }
+    section h2 { font-size: 18px; }
+    .lead { font-size: 14px; }
+    section, section p { font-size: 12px; line-height: 1.5; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-brand-dot"></div>
+    <div>
+      Essex Pathway Portal
+      <span class="topbar-brand-sub">Quick start guide</span>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn" onclick="window.print()">Print or save as PDF</button>
+    <a class="btn btn-primary" href="index.html">Open the portal</a>
+  </div>
+</header>
+
+<main class="page">
+  <div class="page-eyebrow">Quick start guide</div>
+  <h1>Welcome to the Essex Pathway Portal</h1>
+  <p class="lead">A prototype tool that helps the Provincial Membership Team match prospective candidates with lodges that suit them. This guide takes about five minutes to read and walks you through what each part of the portal is for.</p>
+
+  <div class="toc">
+    <div class="toc-title">What you'll find in this guide</div>
+    <ol>
+      <li><a href="#what-this-is">What this is, and what it isn't</a></li>
+      <li><a href="#finding">Finding a lodge</a></li>
+      <li><a href="#reading">Reading a lodge profile</a></li>
+      <li><a href="#editing">Filling in your lodge's profile</a></li>
+      <li><a href="#admin">For Provincial coordinators</a></li>
+      <li><a href="#limits">What's not in this prototype yet</a></li>
+      <li><a href="#contact">Questions and feedback</a></li>
+    </ol>
+  </div>
+
+  <section id="what-this-is">
+    <h2>1. What this is, and what it isn't</h2>
+    <p>This is a working prototype, not a finished system. You can click through everything, try things, change settings, and explore. It's safe to experiment.</p>
+    <p>Any edits you make are saved to your own browser only. There's no shared database behind the scenes yet. If you open the portal on a different device, you'll see different data. The final system will have a proper backend that all coordinators share.</p>
+    <p>The purpose is to demonstrate the <strong>shape and feel</strong> of the eventual tool. Before we build the real thing, we want the Membership Team to use this prototype, push back on what doesn't work, and shape what comes next.</p>
+    <div class="callout">
+      <strong>Don't worry about breaking it.</strong>
+      Click everything. If something looks wrong or feels off, that's exactly the kind of feedback we want.
+    </div>
+  </section>
+
+  <section id="finding">
+    <h2>2. Finding a lodge</h2>
+    <p>The <strong>Find a Lodge</strong> tab is the main entry point. It lists every lodge in Essex with key facts visible at a glance: where they meet, roughly how many members, and whether they're currently accepting candidates.</p>
+    <p>You can find a specific lodge by typing its name or number into the search bar at the top of the page. Useful when you've heard about a lodge in conversation and want to check the details.</p>
+    <p>To browse by location, the <strong>Regions &amp; Centres</strong> tab groups lodges by the masonic centre they meet at, organised into the four regions of the Province. Good for getting a feel for what's around in a particular area.</p>
+    <p>For matching by geography, the <strong>map view</strong> lets you enter a postcode and a search radius. Lodges within that distance appear on a map, sorted by how far they are from the postcode. Genuinely useful when a candidate says "I live near Brentwood" and you want to know who's nearby.</p>
+    <p>The <strong>Family Trees</strong> tab shows the lineage diagrams of lodges that have shared founders or were consecrated from a common parent.</p>
+    <p>Clicking any lodge anywhere in the portal opens that lodge's profile page.</p>
+  </section>
+
+  <section id="reading">
+    <h2>3. Reading a lodge profile</h2>
+    <p>A lodge's profile page has several parts, all designed to give the Membership Team what they need to make matching decisions.</p>
+    <p>At the top you'll see the lodge's name, number, location, and a coloured status pill. If the lodge has uploaded a crest, it appears alongside.</p>
+    <p>A coloured banner immediately below tells you the state of the profile itself. Green means a current, submitted profile. Orange means it's in draft. Blue means we're showing carried-over sample data because the lodge hasn't yet filled in the new structured form. Red means there's no profile yet, or the existing one is overdue for review.</p>
+    <p>The <strong>quick facts cards</strong> show the four headline facts at a glance: when they meet, ritual standard, membership size, and annual subscription.</p>
+    <p>Below that, the structured profile fills in detail across roughly a dozen areas: meeting pattern, membership and health, officers, candidates and progression, ritual, costs and regalia, lodge character (including four "culture spectrums" that describe the lodge's atmosphere), social and family life, special interests, and any Royal Arch chapters that members belong to.</p>
+    <p>On the right of the page you'll find the lodge's <strong>lineage</strong> — its consecration heritage. Where a lodge has an archived PDF profile from the previous Wix system, that's also available here as a historical reference.</p>
+  </section>
+
+  <section id="editing">
+    <h2>4. Filling in your lodge's profile</h2>
+    <p>If you're a Lodge Secretary editing your own lodge's profile, click <strong>Edit lodge profile</strong> at the top of the lodge page.</p>
+    <p>The form has twelve sections, accessed via the side navigation. You can complete them in any order. Each section's completion is tracked as a fraction (e.g. 3/5) so you can see your progress.</p>
+    <div class="callout">
+      <strong>Auto-save is on by default.</strong>
+      There is no save button. Anything you type or tick is stored automatically. The "Saved a moment ago" indicator in the top right confirms this. You can close the browser at any point and pick up where you left off when you return.
+    </div>
+    <p>Upload your <strong>lodge crest</strong> at the very top of the form. The image is automatically resized and appears on the lodge profile page and the candidate-facing preview.</p>
+    <p>The form deliberately avoids jargon and asks plain questions. Where a question is genuinely about masonic detail (ritual standard, Royal Arch chapters, officer ranks), the wording is for masons. Where a question feeds the candidate-facing preview, the wording is in plain English suitable for a non-mason audience.</p>
+    <p>Use the <strong>Preview</strong> button (top right of the editor, and also at the bottom of the form) to see how a prospective candidate will read the profile. This view deliberately leaves out internal data — officer numbers, ritual specifics, ORF counts — and translates the four culture spectrums into natural-language sentences.</p>
+    <p>When you're satisfied, the <strong>Sign-off</strong> section captures who prepared the profile and when the lodge formally approved it. Then click <strong>Submit profile to Provincial Membership Team</strong> at the bottom. You'll see a confirmation screen and the submission is logged.</p>
+    <p>You can resubmit any time. The Province recommends reviewing your profile at least every three years — the form auto-fills a review date three years from your approval date, which you can adjust.</p>
+  </section>
+
+  <section id="admin">
+    <h2>5. For Provincial coordinators</h2>
+    <p>The <strong>Admin</strong> tab shows the dashboard view used by Provincial Membership coordinators.</p>
+    <p>Five stat cards at the top summarise the state of the Province: total lodges, profiles submitted, lodges with no profile yet (Outstanding), profiles between thirty and thirty-six months stale (Due soon), and profiles past the review point (Overdue).</p>
+    <p><strong>Recent activity</strong> lists profile edits and submissions from the last thirty days, most recent first. Useful for catching up at the start of a session.</p>
+    <p>The <strong>Needs attention</strong> worklists are the main operational tool. Lodges are sorted into:</p>
+    <ul>
+      <li><strong>Overdue</strong> — past the 36-month review point. Contact the lodge to refresh.</li>
+      <li><strong>Due soon</strong> — between 30 and 36 months stale. Worth a chase.</li>
+      <li><strong>Profile outstanding</strong> — lodges that have not yet completed a profile at all.</li>
+    </ul>
+    <p>Each entry is clickable — it jumps to the lodge so you can read the current state and contact the Secretary.</p>
+  </section>
+
+  <section id="limits">
+    <h2>6. What's not in this prototype yet</h2>
+    <p>Worth being honest about the limits.</p>
+    <p>This is a single-device prototype. Any edits you make are stored in your browser's local storage. Open the portal on a different laptop, or in a private browsing window, and you'll see different data. The real version will have a backend that all coordinators share.</p>
+    <p>There is no candidate intake system in this portal. That already exists separately in the Provincial workflow. This portal currently only models the lodge side of the matching equation. The two systems may be brought together later.</p>
+    <p>There are no logins or user roles yet. Anyone with the URL can view and edit anything. The real system will have authentication and role-based permissions (lodge secretaries can edit their own lodge, coordinators can see everything, candidates can see only the candidate-facing view).</p>
+    <p>The matching algorithm is not yet connected. The filters on Find a Lodge work in a basic way against the structured profile data, but a proper candidate-to-lodge matching tool that takes a candidate's preferences and ranks suitable lodges is the next major piece of work.</p>
+    <p>The Provincial Membership Team email address shown on the submission confirmation is a placeholder. Submissions don't go anywhere real today.</p>
+    <p>Some lodges still need their data tidied up — there are a few likely duplicates and a small handful of lodges whose meeting data wasn't picked up cleanly from the original scrape.</p>
+  </section>
+
+  <section id="contact">
+    <h2>7. Questions and feedback</h2>
+    <p>This prototype exists to be improved. Anything that confuses you, anything that doesn't work the way you'd expect, anything missing — please flag it.</p>
+    <p>For questions about how the portal works, ideas for what should be added, or anything that looks broken, contact the <strong>Provincial Membership Team</strong>.</p>
+    <p>Feedback gathered during the prototype phase will shape what gets built in the full system. The version you're using today may have changed by next week — that's intentional. The aim is to converge on something the team genuinely finds useful before any commitment is made to building the full system.</p>
+  </section>
+
+  <div class="page-footer">
+    Essex Provincial Pathway Portal &middot; Quick start guide &middot; Last updated June 2026
+  </div>
+</main>
+
+</body>
+</html>
