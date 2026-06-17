@@ -6533,6 +6533,7 @@ window.PORTAL_DATA = {
       "Clacton",
       "Frinton",
       "Harwich",
+      "Maldon",
       "Manningtree",
       "Tollesbury",
       "Westmersea",
