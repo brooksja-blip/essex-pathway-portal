@@ -2381,19 +2381,19 @@ window.PORTAL_DATA = {
     },
     {
       "id": "lodge-of-benificence-l7978",
-      "name": "Lodge of Benificence",
+      "name": "Lodge of Beneficence",
       "number": "7978",
       "region": "Essex South 1",
       "centre": "Orsett",
       "status": "No Profile",
       "matching_status": "unknown",
-      "lineage": "Lodge of True Friendship 160 → Priory Lodge 1000 → Pitsea Lodge 4837 → Lodge of Benificence 7978",
+      "lineage": "Lodge of True Friendship 160 → Priory Lodge 1000 → Pitsea Lodge 4837 → Lodge of Beneficence 7978",
       "schedule_text": "Third Thursday in February (Installation); First Thursday in April; Fourth Thursday in May; Third Thursday in October; Third Thursday in November",
       "meeting_days": [
         "Thursday"
       ],
       "ritual": "Emulation",
-      "memberships": 41,
+      "memberships": 40,
       "notes": "",
       "interests": [],
       "profile_pdf": "",
@@ -5997,6 +5997,90 @@ window.PORTAL_DATA = {
       "profile_pdf": "https://04f46e07-b177-4875-9357-fef12f2fd7a2.filesusr.com/ugd/11fb8d_e8ffdcfaf15f4b38928774ab47bbab97.pdf",
       "family_tree_pdf": "https://04f46e07-b177-4875-9357-fef12f2fd7a2.filesusr.com/ugd/11fb8d_86bcd22e5dd5475a99df3f8a6eab88e1.pdf",
       "source_url": "https://paulmorgan20.wixsite.com/lftsouthend/vega"
+    },
+    {
+      "id": "lodge-of-st-peter-l1024",
+      "name": "Lodge of St. Peter",
+      "number": "1024",
+      "region": "Essex North 1",
+      "centre": "Maldon",
+      "status": "Profile Published",
+      "matching_status": "open",
+      "lineage": "Lodge of Good Fellowship 276 → Lodge of St. Peter 1024",
+      "schedule_text": "Fourth Wednesday in January; Fourth Wednesday in February; Fourth Wednesday in March; Fourth Wednesday in April; Fourth Wednesday in May; Fourth Wednesday in September; Fourth Wednesday in October; Fourth Wednesday in November; Third Wednesday in December",
+      "meeting_days": [
+        "Wednesday"
+      ],
+      "ritual": "Emulation",
+      "memberships": 44,
+      "notes": "",
+      "interests": [],
+      "profile_pdf": "",
+      "family_tree_pdf": "",
+      "source_url": ""
+    },
+    {
+      "id": "beeleigh-abbey-lodge-l7017",
+      "name": "Beeleigh Abbey Lodge",
+      "number": "7017",
+      "region": "Essex North 1",
+      "centre": "Maldon",
+      "status": "Profile Published",
+      "matching_status": "open",
+      "lineage": "Lodge of Good Fellowship 276 → Lodge of St. Peter 1024 → Beeleigh Abbey Lodge 7017",
+      "schedule_text": "Third Wednesday in October; Third Wednesday in November; Second Wednesday in December; Third Wednesday in January; Third Wednesday in February; Third Wednesday in March; Third Wednesday in April",
+      "meeting_days": [
+        "Wednesday"
+      ],
+      "ritual": "Emulation",
+      "memberships": 48,
+      "notes": "",
+      "interests": [],
+      "profile_pdf": "",
+      "family_tree_pdf": "",
+      "source_url": ""
+    },
+    {
+      "id": "wheel-of-fellowship-lodge-l9016",
+      "name": "Wheel of Fellowship Lodge",
+      "number": "9016",
+      "region": "Essex North 1",
+      "centre": "Maldon",
+      "status": "Profile Published",
+      "matching_status": "open",
+      "lineage": "Wheel of Fellowship Lodge 9016",
+      "schedule_text": "First Monday in February; First Monday in April; First Monday in June; First Monday in September; First Monday in November",
+      "meeting_days": [
+        "Monday"
+      ],
+      "ritual": "Emulation (Taymulation - mix with Taylors)",
+      "memberships": 35,
+      "notes": "",
+      "interests": [],
+      "profile_pdf": "",
+      "family_tree_pdf": "",
+      "source_url": ""
+    },
+    {
+      "id": "frederick-leistikow-lodge-l9143",
+      "name": "Frederick Leistikow Lodge",
+      "number": "9143",
+      "region": "Essex North 1",
+      "centre": "Maldon",
+      "status": "Profile Published",
+      "matching_status": "open",
+      "lineage": "Frederick Leistikow Lodge 9143",
+      "schedule_text": "Second Wednesday in January; Second Wednesday in March; Third Wednesday in May; Second Wednesday in November",
+      "meeting_days": [
+        "Wednesday"
+      ],
+      "ritual": "Taylors",
+      "memberships": 24,
+      "notes": "",
+      "interests": [],
+      "profile_pdf": "",
+      "family_tree_pdf": "",
+      "source_url": ""
     }
   ],
   "enriched": {
@@ -7249,15 +7333,19 @@ window.PORTAL_DATA = {
       "address": {
         "venue": "Maldon Masonic Hall",
         "lines": [
-          "3A Cornwall Hill",
+          "3A Cromwell Hill",
           "Maldon",
           "Essex"
         ],
         "postcode": "CM9 4QD"
       },
       "photo": null,
-      "lodge_ids": [],
-      "data_gap_note": "Five lodges meet at this centre. Their records were not retrieved during the initial data import and will need to be added through the admin interface.",
+      "lodge_ids": [
+        "lodge-of-st-peter-l1024",
+        "beeleigh-abbey-lodge-l7017",
+        "wheel-of-fellowship-lodge-l9016",
+        "frederick-leistikow-lodge-l9143"
+      ],
       "lat": 51.731,
       "lon": 0.677
     }
@@ -7515,9 +7603,9 @@ window.PORTAL_DATA = {
       "Lodge of St. Peter 1024": {
         "name": "Lodge of St. Peter",
         "number": "1024",
-        "in_data": false,
-        "lodge_id": null,
-        "descendants": 3,
+        "in_data": true,
+        "lodge_id": "lodge-of-st-peter-l1024",
+        "descendants": 4,
         "ref": "Lodge of St. Peter 1024"
       },
       "Manor of Newland Lodge 6403": {
@@ -8840,13 +8928,13 @@ window.PORTAL_DATA = {
         "descendants": 2,
         "ref": "Pitsea Lodge 4837"
       },
-      "Lodge of Benificence 7978": {
-        "name": "Lodge of Benificence",
+      "Lodge of Beneficence 7978": {
+        "name": "Lodge of Beneficence",
         "number": "7978",
         "in_data": true,
         "lodge_id": "lodge-of-benificence-l7978",
         "descendants": 0,
-        "ref": "Lodge of Benificence 7978"
+        "ref": "Lodge of Beneficence 7978"
       },
       "Lodge of Fellowship and Unity 8680": {
         "name": "Lodge of Fellowship and Unity",
@@ -10535,6 +10623,30 @@ window.PORTAL_DATA = {
         "lodge_id": null,
         "descendants": 1,
         "ref": "Vega Lodge 6785"
+      },
+      "Beeleigh Abbey Lodge 7017": {
+        "name": "Beeleigh Abbey Lodge",
+        "number": "7017",
+        "in_data": true,
+        "lodge_id": "beeleigh-abbey-lodge-l7017",
+        "descendants": 0,
+        "ref": "Beeleigh Abbey Lodge 7017"
+      },
+      "Wheel of Fellowship Lodge 9016": {
+        "name": "Wheel of Fellowship Lodge",
+        "number": "9016",
+        "in_data": true,
+        "lodge_id": "wheel-of-fellowship-lodge-l9016",
+        "descendants": 0,
+        "ref": "Wheel of Fellowship Lodge 9016"
+      },
+      "Frederick Leistikow Lodge 9143": {
+        "name": "Frederick Leistikow Lodge",
+        "number": "9143",
+        "in_data": true,
+        "lodge_id": "frederick-leistikow-lodge-l9143",
+        "descendants": 0,
+        "ref": "Frederick Leistikow Lodge 9143"
       }
     },
     "children": {
@@ -11095,7 +11207,8 @@ window.PORTAL_DATA = {
         "Merchant Navy Lodge 781"
       ],
       "Lodge of St. Peter 1024": [
-        "Manor of Newland Lodge 6403"
+        "Manor of Newland Lodge 6403",
+        "Beeleigh Abbey Lodge 7017"
       ],
       "Ixion Lodge 4700": [
         "Herogate Lodge 4960",
@@ -11372,7 +11485,7 @@ window.PORTAL_DATA = {
         "The Membership Team Lodge"
       ],
       "Pitsea Lodge 4837": [
-        "Lodge of Benificence 7978",
+        "Lodge of Beneficence 7978",
         "[Full Pitsea Lodge L4837 Family Tre](https://04f46e07-b177-4875-9357-fef12f2fd7a2.filesusr.com/ugd/11fb8d_6ac02c40e47d40ffaf259a8c794b2917.pdf)[e](https://04f46e07-b177-4875-9357-fef12f2fd7a2.filesusr.com/ugd/11fb8d_6ac02c40e47d40ffaf259a8c794b2917.pdf)"
       ],
       "Abbs Cross Lodge Lodge 6920": [
@@ -11536,7 +11649,7 @@ window.PORTAL_DATA = {
       "Hornchurch Lodge 5790": [],
       "Belfairs Lodge 4730": [],
       "Lodge of United Progress 6992": [],
-      "Lodge of Benificence 7978": [],
+      "Lodge of Beneficence 7978": [],
       "[Full Pitsea Lodge L4837 Family Tre](https://04f46e07-b177-4875-9357-fef12f2fd7a2.filesusr.com/ugd/11fb8d_6ac02c40e47d40ffaf259a8c794b2917.pdf)[e](https://04f46e07-b177-4875-9357-fef12f2fd7a2.filesusr.com/ugd/11fb8d_6ac02c40e47d40ffaf259a8c794b2917.pdf)": [],
       "Abbots Hall Lodge 6205": [],
       "St. Laurence Lodge 3345": [],
