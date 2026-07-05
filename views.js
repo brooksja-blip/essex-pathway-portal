@@ -277,6 +277,10 @@ function renderLodgeRow(lodge) {
   if (lodge.memberships !== null) {
     tags.push(`<span class="tag">${lodge.memberships} members</span>`);
   }
+  // Age profile chip - shows the bucket (Younger / Mixed / Older) when a profile is set
+  if (en?.age_demographic) {
+    tags.push(`<span class="tag age">Age: ${escapeHtml(en.age_demographic)}</span>`);
+  }
   lodge.interests.forEach(i => {
     tags.push(`<span class="tag interest">${escapeHtml(i)}</span>`);
   });
@@ -500,106 +504,121 @@ function renderLodgeDetail() {
   if (!lodge) {
     return `<div class="page"><div class="empty-state">Lodge not found</div></div>`;
   }
-
-  // Load the new structured profile (returns empty schema if nothing saved)
-  const p = loadProfile(lodge.id);
-  const completion = profileCompletion(p);
-  const hasOwnProfile = hasStoredProfile(lodge.id);
   const en = enrichedFor(lodge.id);
-
-  // Status pill (Accepting candidates / Joining only / Not progressing / Unknown).
-  // Prefer the new profile's currentlyAccepting field; fall back to lodge.matching_status.
-  let displayStatus = lodge.matching_status;
-  if (p.currentlyAccepting === 'Yes') displayStatus = 'open';
-  else if (p.currentlyAccepting === 'Yes but slow') displayStatus = 'open';
-  else if (p.currentlyAccepting === 'No, no initiates currently') displayStatus = 'no_initiates';
-  else if (p.currentlyAccepting === 'No, non-progressive') displayStatus = 'closed';
 
   const statusLabel = {
     'open': 'Accepting candidates',
     'no_initiates': 'Joining members only',
     'closed': 'Not progressing',
     'unknown': 'Status unknown'
-  }[displayStatus];
+  }[lodge.matching_status];
   const statusClass = {
     'open': 'status-open',
     'no_initiates': 'status-attention',
     'closed': 'status-closed',
     'unknown': 'status-closed'
-  }[displayStatus];
+  }[lodge.matching_status];
 
   // Lineage parse - "A 123 → B 456 → C 789"
   const lineageSteps = (lodge.lineage || '').split('→').map(s => s.trim()).filter(Boolean);
 
-  // Quick facts - prefer new profile data, fall back to lodge record / enriched
-  const meetingsSummary = (typeof summarizeMeetingRules === 'function') ? summarizeMeetingRules(p.meetingRules || []) : '';
-  const factMeets = meetingsSummary || (lodge.meeting_days?.length ? lodge.meeting_days.join(', ') : '');
-  const factRitual = p.ritualStandard || lodge.ritual || '';
-  const factMembers = (p.subscribingMembers !== '' && p.subscribingMembers !== null && p.subscribingMembers !== undefined)
-    ? p.subscribingMembers
-    : (lodge.memberships ?? '');
-  const factAttendance = (p.regularAttendance !== '' && p.regularAttendance !== null && p.regularAttendance !== undefined)
-    ? `${p.regularAttendance} regularly attend`
-    : (en?.regular_attendance ? `${en.regular_attendance} regularly attend` : '');
-  const factSubscription = (p.annualSubscription !== '' && p.annualSubscription !== null && p.annualSubscription !== undefined)
-    ? `\u00a3${p.annualSubscription}`
-    : (en?.annual_subscription ? `\u00a3${en.annual_subscription}` : '');
-  const factTime = p.meetingTime || en?.meeting_time || '';
-
   return `
     <div class="page">
       <div class="detail-back">
-        <button data-nav="find">\u2190 Back to results</button>
+        <button data-nav="find">← Back to results</button>
       </div>
 
-      <div class="detail-header${p.crestImage ? ' has-crest' : ''}">
-        ${p.crestImage ? `<img src="${escapeHtml(p.crestImage)}" alt="${escapeHtml(lodge.name)} crest" class="detail-crest">` : ''}
-        <div class="detail-header-text">
-          <h1 class="detail-name">${escapeHtml(lodge.name)}</h1>
-          <div class="detail-meta">
-            <span class="num">L${escapeHtml(lodge.number)}</span>
-            <button class="link-button" data-centre="${escapeHtml(slugify(lodge.centre))}">${escapeHtml(PORTAL_DATA.centres[lodge.centre]?.display_name || lodge.centre)}</button>
-            <span class="muted">\u00b7</span>
-            <span>${escapeHtml(lodge.region)}</span>
-            <span class="muted">\u00b7</span>
-            <span class="status-pill ${statusClass}"><span class="status-dot"></span>${escapeHtml(statusLabel)}</span>
-          </div>
-          <div class="detail-actions">
-            <button class="btn btn-primary" data-edit-profile="${escapeHtml(lodge.id)}">${hasOwnProfile ? 'Edit lodge profile' : 'Create lodge profile'}</button>
-            ${lodge.family_tree_pdf ? `<a class="btn btn-secondary" href="${escapeHtml(lodge.family_tree_pdf)}" target="_blank" rel="noopener">View Family Tree (PDF)</a>` : ''}
-            ${lodge.profile_pdf ? `<a class="btn btn-ghost btn-archive" href="${escapeHtml(lodge.profile_pdf)}" target="_blank" rel="noopener">View archived profile (PDF)</a>` : ''}
-          </div>
+      <div class="detail-header">
+        <h1 class="detail-name">${escapeHtml(lodge.name)}${en?._demo === true ? '<span class="demo-badge">Demo profile</span>' : ''}</h1>
+        <div class="detail-meta">
+          <span class="num">L${escapeHtml(lodge.number)}</span>
+          <button class="link-button" data-centre="${escapeHtml(slugify(lodge.centre))}">${escapeHtml(PORTAL_DATA.centres[lodge.centre]?.display_name || lodge.centre)}</button>
+          <span class="muted">·</span>
+          <span>${escapeHtml(lodge.region)}</span>
+          <span class="muted">·</span>
+          <span class="status-pill ${statusClass}"><span class="status-dot"></span>${escapeHtml(statusLabel)}</span>
+        </div>
+        <div class="detail-actions">
+          <button class="btn btn-primary" data-edit-profile="${escapeHtml(lodge.id)}">Edit lodge profile</button>
+          ${lodge.profile_pdf ? `<a class="btn btn-secondary" href="${escapeHtml(lodge.profile_pdf)}" target="_blank" rel="noopener">View Lodge Profile (PDF)</a>` : ''}
+          ${lodge.family_tree_pdf ? `<a class="btn btn-secondary" href="${escapeHtml(lodge.family_tree_pdf)}" target="_blank" rel="noopener">View Family Tree (PDF)</a>` : ''}
         </div>
       </div>
-
-      ${renderProfileStatusBanner(lodge, p)}
 
       <div class="detail-facts">
         <div class="fact">
           <div class="fact-label">Meets on</div>
           <div class="fact-value">
-            ${factMeets ? escapeHtml(factMeets) : '<span class="muted">Not recorded</span>'}
-            ${factTime ? `<span class="small">at ${escapeHtml(factTime)}</span>` : ''}
+            ${lodge.meeting_days?.length ? lodge.meeting_days.join(', ') : '<span class="muted">Schedule not parsed</span>'}
+            ${en?.meeting_time ? `<span class="small">at ${escapeHtml(en.meeting_time)}</span>` : ''}
           </div>
         </div>
         <div class="fact">
           <div class="fact-label">Ritual</div>
-          <div class="fact-value">${factRitual ? escapeHtml(factRitual) : '<span class="muted">\u2014</span>'}</div>
+          <div class="fact-value">${escapeHtml(lodge.ritual || '—')}</div>
         </div>
         <div class="fact">
           <div class="fact-label">Membership</div>
-          <div class="fact-value">${factMembers === '' ? '<span class="muted">\u2014</span>' : escapeHtml(String(factMembers))}<span class="small">${escapeHtml(factAttendance)}</span></div>
+          <div class="fact-value">${lodge.memberships ?? '—'}<span class="small">${en?.regular_attendance ? `${en.regular_attendance} regularly attend` : ''}</span></div>
         </div>
         <div class="fact">
           <div class="fact-label">Annual subscription</div>
-          <div class="fact-value">${factSubscription || '<span class="muted">\u2014</span>'}</div>
+          <div class="fact-value">${en?.annual_subscription ? `£${en.annual_subscription}` : '<span class="muted">—</span>'}<span class="small">${en?.meal_costs_separate === false ? 'meals included' : en?.meal_costs_separate ? 'meals extra' : ''}</span></div>
         </div>
       </div>
 
       <div class="detail-grid">
         <div>
-          ${renderLodgeProfileSummary(lodge, p)}
+          ${en ? `
+            <div class="section">
+              <h3>Summary</h3>
+              <p>${escapeHtml(en.summary)}</p>
+            </div>
+
+            <div class="section">
+              <h3>The lodge in detail</h3>
+              ${en.consecrated_year ? `<p><strong>Consecrated:</strong> ${en.consecrated_year}${en.sponsoring_lodge ? ` · Sponsored by ${escapeHtml(en.sponsoring_lodge)}` : ''}</p>` : ''}
+              ${en.meets_at ? `<p><strong>Meets at:</strong> ${escapeHtml(en.meets_at)}</p>` : ''}
+              ${en.festive_board_notes ? `<p><strong>Festive Board:</strong> ${escapeHtml(en.festive_board_notes)}</p>` : ''}
+              ${en.lodge_of_instruction ? `<p><strong>Lodge of Instruction:</strong> ${escapeHtml(en.lodge_of_instruction)}</p>` : ''}
+              ${en.social_events?.length ? `<p><strong>Social calendar:</strong> ${en.social_events.map(escapeHtml).join(', ')}</p>` : ''}
+              ${en.ritual_notes ? `<p><strong>Ritual notes:</strong> ${escapeHtml(en.ritual_notes)}</p>` : ''}
+              ${en.masonic_education_notes ? `<p><strong>Masonic education:</strong> ${escapeHtml(en.masonic_education_notes)}</p>` : ''}
+              ${en.diversity_statement ? `<p><strong>Inclusion:</strong> ${escapeHtml(en.diversity_statement)}</p>` : ''}
+              ${en.universities_scheme ? `<p><strong>Universities Scheme:</strong> ${escapeHtml(en.universities_scheme_notes || 'Yes')}</p>` : ''}
+            </div>
+
+            ${en.lodge_priorities?.length ? `
+              <div class="section">
+                <h3>What this lodge prioritises</h3>
+                <p class="subtle-text">Ranked by the lodge itself.</p>
+                <ol class="priority-list">
+                  ${en.lodge_priorities.map((p, i) => `
+                    <li><span class="priority-num">${String(i+1).padStart(2,'0')}</span><span>${escapeHtml(p)}</span></li>
+                  `).join('')}
+                </ol>
+              </div>
+            ` : ''}
+
+            ${en.candidate_motivations_served?.length ? `
+              <div class="section">
+                <h3>Reasons to join this lodge</h3>
+                <p class="subtle-text">Motivations this lodge is likely to satisfy.</p>
+                <ul class="motivation-list">
+                  ${en.candidate_motivations_served.map(m => `<li><span class="priority-num">·</span><span>${escapeHtml(m)}</span></li>`).join('')}
+                </ul>
+              </div>
+            ` : ''}
+          ` : `
+            <div class="section">
+              <h3>About this lodge</h3>
+              <p>This lodge does not yet have a fully structured profile in the portal. Basic information from the source data is shown below. The lodge profile PDF, where available, contains the full briefing the membership team would want.</p>
+              <p>The schedule, ritual, and membership count above come from the source data and are accurate. Other matching criteria require the profile PDF to be structured.</p>
+              ${lodge.profile_pdf ? `<p><a href="${escapeHtml(lodge.profile_pdf)}" target="_blank" rel="noopener">Open the lodge profile PDF →</a></p>` : '<p class="muted">No lodge profile PDF is published yet for this lodge.</p>'}
+            </div>
+          `}
         </div>
+
         <div>
           <div class="section">
             <h3>Lineage</h3>
@@ -617,14 +636,26 @@ function renderLodgeDetail() {
                 }).join('')}
               </div>
             ` : `<p class="muted">No lineage data recorded.</p>`}
-            ${lodge.family_tree_pdf ? `<p style="margin-top:14px"><a href="${escapeHtml(lodge.family_tree_pdf)}" target="_blank" rel="noopener">View full family tree (PDF) \u2192</a></p>` : ''}
+            ${lodge.family_tree_pdf ? `<p style="margin-top:14px"><a href="${escapeHtml(lodge.family_tree_pdf)}" target="_blank" rel="noopener">View full family tree (PDF) →</a></p>` : ''}
           </div>
 
-          ${lodge.profile_pdf ? `
-            <div class="section archived-pdf-note">
-              <h4>Archived profile</h4>
-              <p>This lodge has an older PDF profile from the previous portal. The structured profile shown on the left supersedes it, but the archived PDF remains available for reference.</p>
-              <p><a href="${escapeHtml(lodge.profile_pdf)}" target="_blank" rel="noopener">Open archived profile (PDF) \u2192</a></p>
+          ${en ? `
+            <div class="section">
+              <h3>Membership health</h3>
+              <p><strong>Health:</strong> ${escapeHtml(en.health || '—')}</p>
+              ${en.age_demographic ? `<p><strong>Age profile:</strong> ${escapeHtml(en.age_demographic)}${en.age_notes ? '. ' + escapeHtml(en.age_notes) : ''}</p>` : ''}
+              ${en.candidates_waiting !== undefined ? `<p><strong>Candidates waiting:</strong> ${en.candidates_waiting}</p>` : ''}
+              ${en.initiates_12_months !== undefined ? `<p><strong>Initiates last 12 months:</strong> ${en.initiates_12_months}</p>` : ''}
+              ${en.joiners_12_months !== undefined ? `<p><strong>Joining members last 12 months:</strong> ${en.joiners_12_months}</p>` : ''}
+              ${en.progression_pace ? `<p><strong>Progression pace:</strong> ${escapeHtml(en.progression_pace)}${en.progression_notes ? '. ' + escapeHtml(en.progression_notes) : ''}</p>` : ''}
+              ${en.communication_channels?.length ? `<p><strong>Communication:</strong> ${en.communication_channels.map(escapeHtml).join(', ')}</p>` : ''}
+            </div>
+          ` : ''}
+
+          ${en?._demo ? `
+            <div class="section" style="background:var(--accent-orange-soft); border-color:var(--accent-orange);">
+              <h4 style="color:var(--accent-orange); margin-bottom:8px;">Demo profile</h4>
+              <p style="font-size:14px; margin-bottom:0;">This lodge's structured profile is fabricated for the prototype. Real data would come from the lodge profile PDF parsed through the admin interface.</p>
             </div>
           ` : ''}
         </div>
@@ -1282,226 +1313,28 @@ function renderTreeNode(ref, depth) {
 }
 
 // --- Admin ---
-// ===== Admin page helpers =====
-// Compute everything from currently-stored profiles. No event log yet - we derive
-// activity and worklist on the fly from lastEditedAt / submittedAt timestamps.
-
-function _adminAllProfiles() {
-  const all = [];
-  for (const lodge of PORTAL_DATA.lodges) {
-    if (!hasStoredProfile(lodge.id)) continue;
-    const profile = loadProfile(lodge.id);
-    const mostRecent = profile.lastEditedAt || profile.submittedAt || '';
-    all.push({ lodge, profile, mostRecentDate: mostRecent });
-  }
-  return all;
-}
-
-function _adminStats() {
-  const profiles = _adminAllProfiles();
-  let submitted = 0;
-  let dueSoon = 0;
-  let overdue = 0;
-  for (const item of profiles) {
-    if (item.profile.submittedAt) submitted++;
-    const months = _monthsSince(item.mostRecentDate);
-    if (months !== null) {
-      if (months >= 36) overdue++;
-      else if (months >= 30) dueSoon++;
-    }
-  }
-  const outstanding = PORTAL_DATA.lodges.length - profiles.length;
-  return {
-    totalLodges: PORTAL_DATA.lodges.length,
-    totalProfiles: profiles.length,
-    submitted,
-    dueSoon,
-    overdue,
-    outstanding
-  };
-}
-
-function _adminRecentActivity(days) {
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - days);
-  const events = [];
-  for (const lodge of PORTAL_DATA.lodges) {
-    if (!hasStoredProfile(lodge.id)) continue;
-    const profile = loadProfile(lodge.id);
-    if (profile.submittedAt) {
-      const d = new Date(profile.submittedAt);
-      if (!isNaN(d.getTime()) && d >= cutoff) {
-        events.push({ lodge, date: d, dateIso: profile.submittedAt, type: 'submitted' });
-      }
-    }
-    if (profile.lastEditedAt && profile.lastEditedAt !== profile.submittedAt) {
-      const d = new Date(profile.lastEditedAt);
-      if (!isNaN(d.getTime()) && d >= cutoff) {
-        events.push({ lodge, date: d, dateIso: profile.lastEditedAt, type: 'edited' });
-      }
-    }
-  }
-  events.sort((a, b) => b.date - a.date);
-  return events;
-}
-
-function _adminWorklist() {
-  const all = _adminAllProfiles();
-  const overdue = [];
-  const dueSoon = [];
-  for (const item of all) {
-    const months = _monthsSince(item.mostRecentDate);
-    if (months === null) continue;
-    const entry = { ...item, months: Math.floor(months) };
-    if (months >= 36) overdue.push(entry);
-    else if (months >= 30) dueSoon.push(entry);
-  }
-  // Oldest first within each bucket
-  overdue.sort((a, b) => b.months - a.months);
-  dueSoon.sort((a, b) => b.months - a.months);
-
-  // Outstanding: lodges that have never had a profile saved in the portal.
-  // Sorted by centre then lodge name so admins can work through systematically.
-  const outstanding = [];
-  for (const lodge of PORTAL_DATA.lodges) {
-    if (!hasStoredProfile(lodge.id)) {
-      outstanding.push(lodge);
-    }
-  }
-  outstanding.sort((a, b) => {
-    const c = (a.centre || '').localeCompare(b.centre || '');
-    if (c !== 0) return c;
-    return (a.name || '').localeCompare(b.name || '');
-  });
-
-  return { overdue, dueSoon, outstanding };
-}
-
-function _adminFormatDate(iso) {
-  if (!iso) return '';
-  try {
-    return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  } catch (e) { return ''; }
-}
-
 function renderAdmin() {
-  const stats = _adminStats();
-  const activity = _adminRecentActivity(30);
-  const worklist = _adminWorklist();
-
   return `
     <div class="page">
       <div class="page-header">
         <div>
           <span class="eyebrow">Admin</span>
-          <h1>Province dashboard</h1>
-          <p class="page-header-sub">Overview of lodge profile health and recent activity.</p>
+          <h1>Lodge data management</h1>
+          <p class="page-header-sub">Where the team will structure profile PDFs into matchable data.</p>
         </div>
       </div>
 
-      <div class="admin-stats">
-        <div class="admin-stat">
-          <div class="admin-stat-number">${stats.totalLodges}</div>
-          <div class="admin-stat-label">Lodges in Province</div>
+      <div class="admin-shell">
+        <div class="admin-shell-title">Admin interface goes here</div>
+        <p class="admin-shell-desc">
+          In the full build, this is where authorised members of the team will edit lodge records, structure
+          information from profile PDFs into the matching fields, mark lodges as currently accepting candidates,
+          and update lineage information. The prototype shows the working face of the portal. The admin side
+          is the next phase.
+        </p>
+        <div class="flex gap-2" style="justify-content:center">
+          <button class="btn btn-secondary" data-nav="find">Back to Find a Lodge</button>
         </div>
-        <div class="admin-stat">
-          <div class="admin-stat-number">${stats.submitted}</div>
-          <div class="admin-stat-label">Profiles submitted</div>
-        </div>
-        <div class="admin-stat ${stats.outstanding > 0 ? 'info' : ''}">
-          <div class="admin-stat-number">${stats.outstanding}</div>
-          <div class="admin-stat-label">Outstanding</div>
-        </div>
-        <div class="admin-stat ${stats.dueSoon > 0 ? 'warning' : ''}">
-          <div class="admin-stat-number">${stats.dueSoon}</div>
-          <div class="admin-stat-label">Due soon</div>
-        </div>
-        <div class="admin-stat ${stats.overdue > 0 ? 'critical' : ''}">
-          <div class="admin-stat-number">${stats.overdue}</div>
-          <div class="admin-stat-label">Overdue</div>
-        </div>
-      </div>
-
-      <div class="admin-section">
-        <h2>Recent activity</h2>
-        <p class="admin-section-sub">Profile submissions and edits in the last 30 days, most recent first.</p>
-        ${activity.length ? `
-          <div class="admin-activity-list">
-            ${activity.map(e => `
-              <div class="admin-activity-item">
-                <span class="admin-activity-date">${escapeHtml(_adminFormatDate(e.dateIso))}</span>
-                <button class="link-button admin-activity-lodge" data-lodge="${escapeHtml(e.lodge.id)}">${escapeHtml(e.lodge.name)} <span class="num mono">L${escapeHtml(e.lodge.number)}</span></button>
-                <span class="admin-activity-action ${e.type}">${e.type === 'submitted' ? 'submitted to Province' : 'profile edited'}</span>
-              </div>
-            `).join('')}
-          </div>
-        ` : `<p class="muted">No profile activity in the last 30 days.</p>`}
-      </div>
-
-      <div class="admin-section">
-        <h2>Needs attention</h2>
-        <p class="admin-section-sub">Lodges whose profiles need refreshing, oldest first.</p>
-
-        ${worklist.overdue.length ? `
-          <div class="admin-worklist-block overdue">
-            <h3>Overdue <span class="admin-worklist-count">${worklist.overdue.length}</span></h3>
-            <p class="admin-worklist-intro">Past the 36-month review point. Contact lodges to refresh.</p>
-            <div class="admin-worklist">
-              ${worklist.overdue.map(item => `
-                <button class="admin-worklist-item" data-lodge="${escapeHtml(item.lodge.id)}">
-                  <div class="admin-worklist-name">
-                    <strong>${escapeHtml(item.lodge.name)}</strong>
-                    <span class="num mono">L${escapeHtml(item.lodge.number)}</span>
-                    <span class="muted">${escapeHtml(item.lodge.centre)}</span>
-                  </div>
-                  <div class="admin-worklist-age">${item.months} months stale</div>
-                </button>
-              `).join('')}
-            </div>
-          </div>
-        ` : ''}
-
-        ${worklist.dueSoon.length ? `
-          <div class="admin-worklist-block due-soon">
-            <h3>Due soon <span class="admin-worklist-count">${worklist.dueSoon.length}</span></h3>
-            <p class="admin-worklist-intro">Between 30 and 36 months stale. Worth reaching out.</p>
-            <div class="admin-worklist">
-              ${worklist.dueSoon.map(item => `
-                <button class="admin-worklist-item" data-lodge="${escapeHtml(item.lodge.id)}">
-                  <div class="admin-worklist-name">
-                    <strong>${escapeHtml(item.lodge.name)}</strong>
-                    <span class="num mono">L${escapeHtml(item.lodge.number)}</span>
-                    <span class="muted">${escapeHtml(item.lodge.centre)}</span>
-                  </div>
-                  <div class="admin-worklist-age">${item.months} months stale</div>
-                </button>
-              `).join('')}
-            </div>
-          </div>
-        ` : ''}
-
-        ${worklist.outstanding.length ? `
-          <div class="admin-worklist-block outstanding">
-            <h3>Profile outstanding <span class="admin-worklist-count">${worklist.outstanding.length}</span></h3>
-            <p class="admin-worklist-intro">These lodges have not yet completed a profile in the portal. Grouped by centre.</p>
-            <div class="admin-worklist">
-              ${worklist.outstanding.map(lodge => `
-                <button class="admin-worklist-item" data-lodge="${escapeHtml(lodge.id)}">
-                  <div class="admin-worklist-name">
-                    <strong>${escapeHtml(lodge.name)}</strong>
-                    <span class="num mono">L${escapeHtml(lodge.number)}</span>
-                    <span class="muted">${escapeHtml(lodge.centre)}</span>
-                  </div>
-                  <div class="admin-worklist-age">No profile</div>
-                </button>
-              `).join('')}
-            </div>
-          </div>
-        ` : ''}
-
-        ${!worklist.overdue.length && !worklist.dueSoon.length && !worklist.outstanding.length ? `
-          <p class="muted">All lodges have an up-to-date profile. Nothing to chase.</p>
-        ` : ''}
       </div>
     </div>
   `;
