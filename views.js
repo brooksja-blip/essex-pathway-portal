@@ -277,6 +277,23 @@ function renderLodgeRow(lodge) {
   if (lodge.memberships !== null) {
     tags.push(`<span class="tag">${lodge.memberships} members</span>`);
   }
+  // Age profile chip: prefer the saved profile's descriptor, fall back to
+  // the enriched bucket mapped to the same 5-option vocabulary.
+  let ageLabel = null;
+  try {
+    const stored = localStorage.getItem('pathway_profile_' + lodge.id);
+    if (stored) {
+      const p = JSON.parse(stored);
+      if (p && p.ageProfile) ageLabel = p.ageProfile;
+    }
+  } catch (e) {}
+  if (!ageLabel && en?.age_demographic) {
+    const map = { 'Younger': 'Younger leaning', 'Mixed': 'Broad mix', 'Older': 'Mature leaning' };
+    ageLabel = map[en.age_demographic] || en.age_demographic;
+  }
+  if (ageLabel) {
+    tags.push(`<span class="tag age">Age: ${escapeHtml(ageLabel)}</span>`);
+  }
   lodge.interests.forEach(i => {
     tags.push(`<span class="tag interest">${escapeHtml(i)}</span>`);
   });
